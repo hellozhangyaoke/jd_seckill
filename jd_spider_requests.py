@@ -51,10 +51,11 @@ class JdSeckill(object):
         """
         self.login()
         while True:
-            try:
-                self.make_reserve()
-            except Exception as e:
-                logger.info('预约发生异常!', e)
+            self.make_reserve()
+            # try:
+            #     self.make_reserve()
+            # except Exception as e:
+            #     logger.info('预约发生异常!', e)
             self.wati_some_time()
 
     def __seckill(self):
@@ -70,7 +71,7 @@ class JdSeckill(object):
             except Exception as e:
                 logger.info('抢购发生异常，稍后继续执行！', e)
             self.wati_some_time()
-
+ 
     def login(self):
         for flag in range(1, 3):
             try:
@@ -108,14 +109,16 @@ class JdSeckill(object):
             'User-Agent': self.default_user_agent,
             'Referer': 'https://item.jd.com/{}.html'.format(self.sku_id),
         }
+        print(self.sku_id)
         resp = self.session.get(url=url, params=payload, headers=headers)
         resp_json = parse_json(resp.text)
         reserve_url = resp_json.get('url')
-        self.timers.start()
+        # self.timers.start()
         while True:
             try:
                 self.session.get(url='https:' + reserve_url)
                 logger.info('预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约')
+                print("预约成功！")
                 if global_config.getRaw('messenger', 'enable') == 'true':
                     success_message = "预约成功，已获得抢购资格 / 您已成功预约过了，无需重复预约"
                     send_wechat(success_message)
